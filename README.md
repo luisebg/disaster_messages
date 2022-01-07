@@ -1,4 +1,21 @@
 # Disaster Response Pipeline Project
+This project aims to deploy a dashboard with different visualizations built with PlotlyJS and Flask.
+Classification models were loaded to allow the user to write a sentence or word and see the classification of their message
+
+## Setup
+Before running the app install the following libraries:
+- pandas
+- numpy
+- nltk
+- re
+- sqlalchemy
+- sklearn
+- plotly
+- flask
+- pickle
+
+### Data import
+Download the files 'disaster_categories.csv' and 'disaster_messages.csv' into /data folder.
 
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
