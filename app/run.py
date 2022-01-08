@@ -18,6 +18,16 @@ nltk.download('stopwords')
 app = Flask(__name__)
 
 def tokenize(text):
+    """ tokenize the given text (sentence). 
+    it converts text input in lowercase, remove stop words and reduce que words with lemmatization
+    
+    - Input:
+        text - string with a sequence of words.
+        
+    - Output:
+        clean_tokens - list of lemmatized words
+        
+    """
     text = re.sub(r"[^a-zA-Z0-9]", " ", text)
     tokens = word_tokenize(text)
     tokens = [word for word in tokens if word not in stopwords.words("english")]
