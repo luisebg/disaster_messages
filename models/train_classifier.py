@@ -22,8 +22,21 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 
 def load_data(database_filepath):
+    """ Loads the data from the database_filepath database.
+    It returns the independent variables (X), the dependent variables (y), and the names of the dependent variables
+    
+    - Input:
+        database_filepath, str with the path of the database to read
+        
+    - Output:
+        X - Pandas dataframe with the dependent variables (messages).
+        y - Pandas dataframe with the independent variables (labeled features for the classifier)
+        y.columns - list of columns names.
+    """
+    # Load data from database
     engine = create_engine(f'sqlite:///{database_filepath}')
     conn = engine.connect()
+    # Query table
     df = pd.read_sql_query("SELECT * FROM labeled_messages;", conn)
     X = df['message']
     y = df.drop(columns=['id', 'message', 'original', 'genre','child_alone'])
@@ -35,6 +48,13 @@ def load_data(database_filepath):
 def tokenize(text):
     """ tokenize the given text (sentence). 
     it converts text input in lowercase, remove stop words and reduce que words with lemmatization
+    
+    - Input:
+        text - string with a sequence of words.
+        
+    - Output:
+        lemmed - list of lemmatized words
+        
     """
     # Normalize
     text = re.sub(r"[^a-zA-Z0-9]", " ", text)
@@ -51,6 +71,18 @@ def tokenize(text):
 
 
 def build_model():
+    """ Creates the pipeline with three processes:
+    - CountVectorizer (count the frequency of words in a corpus)
+    - TfidfTransformer (returns the frequency of terms in a corpus)
+    - MultiOutputClassifier (creates a classifier for each class)
+    
+    - Input:
+        None
+        
+    - Output:
+        pipeline - sknlearn object with the methods fit and transform
+        
+    """
     pipeline = Pipeline([
         ('cvect', CountVectorizer(tokenizer=tokenize)),
         ('tdidf', TfidfTransformer()),
@@ -60,12 +92,33 @@ def build_model():
 
 
 def evaluate_model(model, X_test, y_test, category_names):
+    """ It prints the model metrics using X_test to generate y_pred and then compare it with y_test
+    
+    - Input:
+        model - sklearn model with the predict method
+        X_test - numpy array or pandas dataframe with the testing data
+        y_test - numpy array or pandas dataframe with the test labels
+        category_names - list of str with the names of the categories
+        
+    - Output:
+        None
+    """
     y_pred = model.predict(X_test)
     print('Classification report: {}'.format(classification_report(y_test, y_pred,
                                                                    target_names=category_names)))
 
 
 def save_model(model, model_filepath):
+    """ Save the model into a pickle file
+    
+    -Input:
+        model - sklearn model
+        model_filepath - str with the path of the model to save
+        
+    - Output:
+        None
+        
+    """
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
