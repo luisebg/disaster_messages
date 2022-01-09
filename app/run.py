@@ -41,7 +41,7 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/data.db')
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('labeled_messages', engine)
 words_freq = pd.read_sql_table('common_terms', engine)
 words_freq.sort_values('Frequency', inplace=True, ascending=False)
