@@ -39,6 +39,7 @@ def load_data(database_filepath):
     # Query table
     df = pd.read_sql_query("SELECT * FROM labeled_messages;", conn)
     X = df['message']
+    # Drop 'child_alone' column since there are not samples for the category
     y = df.drop(columns=['id', 'message', 'original', 'genre','child_alone'])
     y.related.replace(2,1,inplace=True)
     
@@ -88,7 +89,17 @@ def build_model():
         ('tdidf', TfidfTransformer()),
         ('classifier', MultiOutputClassifier(RandomForestClassifier()))
     ])
-    return pipeline
+    
+    parameters = {
+        'tdidf__norm':['l1','l2']
+        # Comments these lines to test less parameters (testing all parameters can be computing expensive)
+        #'tdidf__smooth_idf':[True, False]
+        #'classifier__estimator__n_estimators':[100,200]
+    }
+    
+    # Find the best model parameters
+    best_pipeline = GridSearchCV(pipeline,parameters)
+    return best_pipeline
 
 
 def evaluate_model(model, X_test, y_test, category_names):

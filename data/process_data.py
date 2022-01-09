@@ -9,6 +9,8 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
 
+nltk.download('stopwords')
+
 def transform_categories(dataframe):
     """ proprocess categories.csv file. It defines the column names and values based on the 'categories' column.
     
@@ -24,9 +26,15 @@ def transform_categories(dataframe):
     col_names=preprocessed_df.iloc[0].apply(lambda x: x.split("-")[0]).tolist()
     # Filter each column to only have a numerical value in column values
     for col in preprocessed_df:
-        preprocessed_df[col] = preprocessed_df[col].apply(lambda x: x.split("-")[1]).astype(np.int) 
+        preprocessed_df[col] = preprocessed_df[col].apply(lambda x: x.split("-")[1]).astype(np.int)
     # set columns names
     preprocessed_df.columns=col_names
+    # Check if all data is binary
+    non_bin = preprocessed_df.columns[~preprocessed_df.isin([0,1]).all()]
+    # If there is a non binary point, it converts it to 1
+    for non_bin_col in non_bin:
+        print('Info: non-binary values found in column: {} cleaning ...'.format(non_bin_col))
+        preprocessed_df[preprocessed_df[non_bin_col]>1] = 1
     return preprocessed_df
 
 def load_data(messages_filepath, categories_filepath):
